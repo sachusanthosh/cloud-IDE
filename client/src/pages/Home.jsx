@@ -98,6 +98,7 @@ const Home = () => {
         <div className="flex-1 overflow-auto">
           <p className="text-xs text-gray-300">
             {selectedFiles.replaceAll("/", " > ")}
+            {isSaved? "saved": "un-saved"}
           </p>
           <CodeEditor
             value={editorContent}
@@ -105,7 +106,7 @@ const Home = () => {
           />
         </div>
 
-        <div className="h-1/4 bg-black text-green-500 overflow-auto scrollbar-hide p-2">
+        <div className="h-1/4 bg-[#181818] text-green-500 overflow-auto scrollbar-hide p-2">
           <Terminal />
         </div>
       </div>

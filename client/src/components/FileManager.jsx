@@ -1,32 +1,44 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
 
 const FileTreeNode = ({ fileName, nodes, onSelect, path }) => {
-  const isFolder = nodes;
+  const [isExpanded, setIsExpanded] = useState(false); // State to manage folder expansion
+
+  const isFolder = nodes !== null && typeof nodes === 'object'; // Check if nodes is an object (even an empty object)
+
+  const handleFolderClick = (e) => {
+    e.stopPropagation();
+    setIsExpanded((prev) => !prev); // Toggle expansion state
+  };
 
   return (
-    <div
-      className="mx-3"
-      onClick={(e) => {
-        e.stopPropagation();
-        if (isFolder) return;
-        onSelect(path);
-      }}
-    >
-      <i
-        className={`bi ${isFolder ? "bi-folder" : "bi-file-earmark-code-fill"}`}
-      ></i>
-      <span
-        className={`ml-2 ${isFolder ? "cursor-default" : "cursor-pointer"}`}
+    <div className="mx-3 text-sm">
+      <div
+        onClick={isFolder ? handleFolderClick : () => onSelect(path)}
+        role="button"
+        aria-expanded={isFolder ? isExpanded : undefined}
+        className={`flex items-center p-1 rounded cursor-pointer transition-all ${
+          isFolder ? "hover:bg-[#444444]" : "hover:bg-[#333333]"
+        }`}
       >
-        {fileName}
-      </span>
-      {isFolder && (
-        <ul>
+        <i
+          className={`bi ${
+            isFolder
+              ? isExpanded
+                ? "bi-folder2-open"
+                : "bi-folder"
+              : "bi-file-earmark-code-fill"
+          }`}
+        ></i>
+        <span className="ml-2 text-gray-300 hover:text-white">{fileName}</span>
+      </div>
+      {isFolder && isExpanded && (
+        <ul className="ml-4 transition-all">
           {Object.keys(nodes).map((child) => (
             <li key={child}>
               <FileTreeNode
                 onSelect={onSelect}
-                path={path + "/" + child}
+                path={`${path}/${child}`}
                 fileName={child}
                 nodes={nodes[child]}
               />
