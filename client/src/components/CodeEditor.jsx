@@ -1,18 +1,23 @@
 import Editor from "@monaco-editor/react";
-// import { useState } from "react";
+import PropTypes from "prop-types";
 
-const CodeEditor = () => {
-
+const CodeEditor = ({ value, onChange }) => {
   return (
-    <div>
+
       <Editor
         height="90vh"
-        defaultLanguage="javascript"
-        defaultValue="// some comment"
+        language="javascript"
+        value={value}
         theme="vs-dark"
+        onChange={(newValue) => onChange(newValue)}
       />
-    </div>
+
   );
+};
+
+CodeEditor.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default CodeEditor;

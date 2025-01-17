@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import fs from "fs/promises"
 
 const FileTreeNode = ({ fileName, nodes, onSelect, path }) => {
   const isFolder = nodes;
@@ -39,13 +38,20 @@ const FileTreeNode = ({ fileName, nodes, onSelect, path }) => {
   );
 };
 
+FileTreeNode.propTypes = {
+  fileName: PropTypes.string.isRequired,
+  nodes: PropTypes.object, // Node can be an object representing children
+  onSelect: PropTypes.func.isRequired, // Function to handle selection
+  path: PropTypes.string.isRequired, // Path as a string
+};
+
 const FileManager = ({ tree, onSelect }) => {
   return <FileTreeNode onSelect={onSelect} fileName="/" nodes={tree} path="" />;
 };
 
-FileTreeNode.propTypes = {
-  fileName: PropTypes.any,
-  nodes: PropTypes.any,
+FileManager.propTypes = {
+  tree: PropTypes.object.isRequired, // Tree object representing the file structure
+  onSelect: PropTypes.func.isRequired, // Function to handle selection
 };
 
 export default FileManager;

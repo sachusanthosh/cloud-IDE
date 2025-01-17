@@ -36,7 +36,7 @@ chokidar.watch(path.normalize('./user')).on('all', async (event, filePath) => {
     const updatedTree = await generateFileTree('./user');
     console.log("Emitting updated file tree:", updatedTree);
     io.emit('file:refresh', updatedTree);
-  
+
   } catch (error) {
     console.error("Error generating file tree:", error);
   }
@@ -49,6 +49,10 @@ chokidar.watch(path.normalize('./user')).on('all', async (event, filePath) => {
 io.on('connection', (socket) => {
   console.log(`Socket connected`, socket.id)
 
+  socket.on('file:change', async ({path, content}) => {
+    await fs.writeFile(`./user${path}`, content)
+  })
+
   socket.on('terminal:write', (data) => {
     ptyProcess.write(data);
   })
@@ -58,9 +62,27 @@ ptyProcess.onData(data => {
   io.emit('terminal:data', data)
 })
 
+// get request for getting the file tree
 app.get('/files', async (req, res) => {
-    const filTree = await generateFileTree('./user');
-    return res.json({tree: filTree})
+  const filTree = await generateFileTree('./user');
+  return res.json({ tree: filTree })
+
+})
+
+
+// get request for content of the file
+app.get('/files/content', async (req, res) => {
+  const path = req.query.path;
+  try {
+    const content = await fs.readFile(`./user${path}`, "utf-8");
+
+    console.log(content);
+    return res.json({ content });
+
+  } catch (error) {
+    console.error("Error reading file content:", error);
+    res.status(500).json({ error: "Failed to read file content" });
+  }
 
 })
 
@@ -81,7 +103,7 @@ async function generateFileTree(dir) {
       if (stat.isDirectory()) {
         currTree[file] = {}
         await buildTree(filePath, currTree[file]);
-      }else{
+      } else {
         currTree[file] = null;
       }
     }
